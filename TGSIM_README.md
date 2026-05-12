@@ -1,20 +1,9 @@
 # Automated PII Redaction for Public Media Sharing  
 ## EgoBlur Gen2: Method, Pipeline, and Limitations
 
-**Audience:** Teams publishing images or video to the public who need a clear explanation of *how* personally identifiable information (PII) is reduced before release.  
-**Scope:** Face and license-plate handling using Meta’s open **EgoBlur** Gen2 models and the `egoblur-gen2` tooling in this repository.
-
 ---
 
-### 1. Purpose and privacy goal
-
-When imagery is shared externally—websites, datasets, press material, or partner deliverables—two common sources of PII are **human faces** and **vehicle license plates**. Even when other metadata is stripped, visible faces and readable plates can identify individuals or tie vehicles to people and locations.
-
-The workflow described here is **detect-then-redact**: software finds regions likely to contain faces or plates, then **permanently overwrites** those pixels in the exported image or video so they are no longer recognizable in the distributed file. This is a **risk-reduction** measure: it lowers the chance that PII appears in public copies. It is **not** a formal cryptographic guarantee that every pixel of every identity is removed, because any detector can miss objects or occasionally misfire (see Section 5).
-
----
-
-### 2. What algorithm and models are used?
+### What algorithm and models are used?
 
 **Product name:** EgoBlur (Gen2 in our setup), from Meta’s Project Aria open tooling—documented publicly and distributed as TorchScript (`.jit`) detector weights together with reference code.
 
@@ -31,7 +20,7 @@ Internally, inference follows a **Detectron2-style** pattern (the codebase vendo
 
 ---
 
-### 3. What we are doing in this project (operational pipeline)
+### Operational pipeline
 
 1. **Ingest** source images or video frames (PNG, JPEG, or MP4 via the same CLI).  
 2. **Load** `ego_blur_face_gen2.jit` and `ego_blur_lp_gen2.jit` from disk.  
@@ -47,7 +36,7 @@ For **video**, the same per-frame detection and blur loop applies; audio and non
 
 ---
 
-### 4. How this supports “no PII” narratives for public release
+### How this supports “no PII” narratives for public release
 
 Stakeholders should understand three layers:
 
@@ -59,17 +48,9 @@ Stakeholders should understand three layers:
 
 This approach aligns with common **privacy-by-design** practice for media: minimize identifiable content in the artifact that leaves the trust boundary, without claiming impossible perfection.
 
-**Suggested operational checklist before wide publication**
-
-1. Decide whether **faces**, **plates**, or **both** must be redacted for the audience and jurisdiction.  
-2. Run the pipeline on a **representative subset** (lighting, distance, motion) and adjust thresholds until misses vs. false positives are acceptable.  
-3. **Document** the threshold settings (and software version) used for each release batch for auditability.  
-4. Perform **human QA** on a random sample of outputs; escalate full manual review for especially sensitive content.  
-5. Distribute **only** the redacted exports through channels intended for the public; keep lineage clear so unredacted masters are not accidentally attached to the same bundle.
-
 ---
 
-### 5. Limitations (important for legal/compliance language)
+### Limitations
 
 - **No detector is 100% recall**; small, distant, or unusual faces/plates may score below threshold or not be detected.  
 - **False positives** can blur non-PII (signs, patterns, clothing graphics). Lower thresholds increase recall but also false positives.  
@@ -78,7 +59,7 @@ This approach aligns with common **privacy-by-design** practice for media: minim
 
 ---
 
-### 6. Summary
+### Summary
 
 We remove PII from shareable **images and videos** by running **EgoBlur Gen2 TorchScript detectors** (face and license plate) on each frame, filtering predictions with **score and NMS** rules, and applying **strong localized blur** inside the resulting regions before writing the public copy. The method is **algorithmic redaction**, not identification or re-identification. For public distribution, combine this tooling with **clear data-handling policies**, **threshold tuning** for your camera content, and **QA sampling** so stakeholders have an accurate expectation of protection strength.
 

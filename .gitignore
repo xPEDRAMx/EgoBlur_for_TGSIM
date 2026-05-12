@@ -15,6 +15,7 @@ __pycache__/
 
 # Generated blur outputs (re-run egoblur-gen2 locally)
 test/output/
+test/comparison_plots/
 
 # EgoBlur TorchScript weights are large; keep them local (see README for download)
 *.jit
