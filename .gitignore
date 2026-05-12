@@ -1,0 +1,23 @@
+# Local Python environment
+.venv/
+venv/
+env/
+
+# Editable install / build
+*.egg-info/
+dist/
+build/
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Generated blur outputs (re-run egoblur-gen2 locally)
+test/output/
+
+# EgoBlur TorchScript weights are large; keep them local (see README for download)
+*.jit
+
+# OS / editor
+.DS_Store
